@@ -17,13 +17,14 @@ import java.util.concurrent.Future;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class SimpleChatServer extends AbstractModel {
+public class ChatServer extends AbstractModel {
 
     private static final String TAG = "ExampleWebServiceModel";
 
     private static final String GET_URL = "https://testbed.jaysnellen.com:8443/SimpleChat/board";
     private static final String POST_URL = "https://testbed.jaysnellen.com:8443/SimpleChat/board";
     private static final String DELETE_URL = "https://testbed.jaysnellen.com:8443/SimpleChat/board";
+    private static final String name = "Jailon Lawrence";
     private MutableLiveData<JSONObject> jsonData;
     private String outputText;
 
@@ -33,7 +34,7 @@ public class SimpleChatServer extends AbstractModel {
 
     private String postData; // Added to store JSON data for POST request
 
-    public SimpleChatServer() {
+    public ChatServer() {
         requestThreadExecutor = Executors.newSingleThreadExecutor();
 
         httpGetRequestThread = new Runnable() {
@@ -80,10 +81,11 @@ public class SimpleChatServer extends AbstractModel {
     }
 
     public void setOutputText(String newText) {
+
         String oldText = this.outputText;
         this.outputText = newText;
         Log.i(TAG, "Output Text Change: From " + oldText + " to " + newText);
-        firePropertyChange(ChatController.ELEMENT_OUTPUT_PROPERTY, oldText, newText);
+        firePropertyChange(Controller.ELEMENT_OUTPUT_PROPERTY, oldText, newText);
     }
 
     public void sendGetRequest() {
@@ -150,6 +152,12 @@ public class SimpleChatServer extends AbstractModel {
                 // Check if it's a POST request to include JSON data
                 if (method.equals("POST")) {
                     conn.setDoOutput(true);
+                    /*String messages = MainActivity.name;
+                    JSONObject chat = new JSONObject();
+                    chat.put("name", name);
+                    chat.put("message", messages);
+                    String p = chat.toString();*/
+
                     OutputStream out = conn.getOutputStream();
                     out.write(jsonData.getBytes());
                     out.flush();
@@ -162,15 +170,15 @@ public class SimpleChatServer extends AbstractModel {
                 // Get the response code
                 int code = conn.getResponseCode();
 
-                // Handle DELETE request separately
+                // Handle DELETE
                 if (method.equals("DELETE")) {
                     if (code == HttpURLConnection.HTTP_OK) {
                         Log.d(TAG, "Delete success");
+                        setOutputText("Message Board Cleared");
                     } else {
                         Log.e(TAG, "Delete failed");
                     }
                 } else {
-                    // Handle other HTTP methods (GET, POST, etc.)
                     if (code == HttpsURLConnection.HTTP_OK || code == HttpsURLConnection.HTTP_CREATED) {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
@@ -196,3 +204,4 @@ public class SimpleChatServer extends AbstractModel {
     }
 
 }
+

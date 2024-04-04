@@ -1,6 +1,6 @@
 package edu.jsu.mcis.cs408.simplechat;
 
-public class ChatController extends AbstractController {
+public class Controller extends AbstractController {
 
     public static final String ELEMENT_OUTPUT_PROPERTY = "Output";
 
@@ -8,8 +8,8 @@ public class ChatController extends AbstractController {
         invokeModelMethod("sendGetRequest", null);
     }
 
-    public void sendPostRequest() {
-        invokeModelMethod("sendPostRequest", null);
+    public void sendPostRequest(String message) {
+        invokeModelMethod("sendPostRequest", message);
     }
     public void sendDeleteRequest(){invokeModelMethod("sendDeleteRequest", null);}
 
