@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SimpleChat</string>
+    <string name = "post_btn">Post</string>
+    <string name = "delete_btn">Delete</string>
+</resources>
