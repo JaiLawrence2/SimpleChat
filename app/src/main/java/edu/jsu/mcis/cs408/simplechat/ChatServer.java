@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -11,6 +12,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -84,15 +88,38 @@ public class ChatServer extends AbstractModel {
 
         String oldText = this.outputText;
         this.outputText = newText;
+        // Convert the new text to a map
+        try {
+            JSONObject jsonObject = new JSONObject(newText);
+            Map<String, String> messageList = new HashMap<>();
+
+            // Get an iterator for the keys
+            Iterator<String> keys = jsonObject.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                String value = jsonObject.getString(key);
+                messageList.put(key, value);
+            }
+
+            // Replace newText with the extracted data from the map
+            StringBuilder Data = new StringBuilder();
+            for (Map.Entry<String, String> entry : messageList.entrySet()) {
+                String value = entry.getValue();
+                Data.append(value).append("\n");
+            }
+            this.outputText = Data.toString(); // Replace newText with extracted data
+        } catch (JSONException e) {
+            Log.e(TAG, "Error parsing JSON: " + e.getMessage());
+        }
         Log.i(TAG, "Output Text Change: From " + oldText + " to " + newText);
-        firePropertyChange(Controller.ELEMENT_OUTPUT_PROPERTY, oldText, newText);
+        firePropertyChange(Controller.ELEMENT_OUTPUT_PROPERTY, oldText, this.outputText);
     }
 
     public void sendGetRequest() {
         httpGetRequestThread.run();
     }
 
-    public void sendPostRequest() {
+    public void sendPostRequest(String jsonData) {
         this.postData = String.valueOf(jsonData); // Set JSON data to postData
         httpPostRequestThread.run();
     }
@@ -152,11 +179,6 @@ public class ChatServer extends AbstractModel {
                 // Check if it's a POST request to include JSON data
                 if (method.equals("POST")) {
                     conn.setDoOutput(true);
-                    /*String messages = MainActivity.name;
-                    JSONObject chat = new JSONObject();
-                    chat.put("name", name);
-                    chat.put("message", messages);
-                    String p = chat.toString();*/
 
                     OutputStream out = conn.getOutputStream();
                     out.write(jsonData.getBytes());

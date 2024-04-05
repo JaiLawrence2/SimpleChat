@@ -19,7 +19,7 @@ import java.util.concurrent.Future;
 import edu.jsu.mcis.cs408.simplechat.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity implements AbstractView {
-    //public static ActivityMainBinding binding;
+
     private ActivityMainBinding binding;
     private static final String TAG = "ExampleWebServiceModel";
     public static final String name = "Jailon Lawrence";
@@ -38,9 +38,10 @@ public class MainActivity extends AppCompatActivity implements AbstractView {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
         controller = new Controller();
         ChatServer model = new ChatServer();
-        //httpGetRequestThread.run();
+
         controller.addView(this);
         controller.addModel(model);
 
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements AbstractView {
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
-                model.sendPostRequest();
+                model.sendPostRequest(json.toString());
             }
         });
         binding.Delete.setOnClickListener(new View.OnClickListener() {
